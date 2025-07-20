@@ -22,4 +22,15 @@ router.get("/", async (req, res) => {
   res.json(canvases);
 });
 
+
+
+//delete canvas
+router.delete("/delete/:id", authMiddleware, async (req, res) => {
+
+  const {id} = req.params;
+  console.log(id, req.params, 30);
+  
+  await Canvas.deleteOne({_id : id});
+  res.json();
+});
 module.exports = router;

@@ -23,6 +23,7 @@ import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import Dashboard from "./pages/Dashboard";
 import CanvasRoom from "./pages/CanvasRoom";
+import {ProtectedRoute} from "./middlware/protected"
 
 function App() {
   return (
@@ -30,9 +31,13 @@ function App() {
       <Routes>
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
-        <Route path="/" element={<Dashboard />} />
-        <Route path="/canvas/:id" element={<CanvasRoom />} />
-      </Routes>
+        <Route path="/" element={
+          <ProtectedRoute>
+            <Dashboard />
+            </ProtectedRoute>
+          } />
+            <Route path="/canvas/:id" element={<CanvasRoom />} />
+          </Routes>
     </BrowserRouter>
   );
 }

@@ -1,10 +1,17 @@
 import { useState, useEffect } from "react";
 import axios from "../api";
 import { useNavigate } from "react-router-dom";
+import ConfirmModal from "./ConfirmModel"
 
 const Dashboard = () => {
   const [canvases, setCanvases] = useState([]);
   const [title, setTitle] = useState("");
+  const [error, setError] = useState("");
+  const [showModal, setShowModal] = useState(false); // Modal control
+  const [modelText, setmodelText] = useState("")
+  const [func, setfunc] = useState()
+
+
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -12,40 +19,163 @@ const Dashboard = () => {
   }, []);
 
   const createCanvas = async () => {
-    const res = await axios.post("/canvas/create", { title });
-    navigate(`/canvas/${res.data._id}`);
+    if (!title.trim()) {
+      setError("Please enter a title for the canvas.");
+      return;
+    }
+
+    try {
+      const res = await axios.post("/canvas/create", { title });
+      navigate(`/canvas/${res.data._id}`);
+    } catch (err) {
+      setError("Failed to create canvas. Try again.");
+    }
   };
 
+  const deltefunc = async (id) => {
+    try {
+      console.log("called delete");
+      const res = await axios.delete(`canvas/delete/${id}`);
+      setCanvases((prev) => prev.filter((canvas) => canvas._id !== id));
+    } catch (error) {
+      setError("Item Not deleted");
+    }
 
-  const handleLogOut = () => {
+  }
+
+  const deleteFuncDialog = (id) => {
+    setShowModal(true);
+    setmodelText("Delete");
+    setfunc(() => () => deltefunc(id));
+  }
+
+  const LogOutFuncDialog = () => {
+    setShowModal(true);
+    setmodelText("Log Out");
+    setfunc(() => confirmLogout);
+  }
+
+  const confirmLogout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("username");
-    window.location.href = "/login"; 
+    window.location.href = "/login";
   };
 
   return (
-    <div>
-      <h2>Welcome, {localStorage.getItem("username")}</h2>
+    <div className="min-h-screen bg-gray-50 py-10 px-4 sm:px-6 lg:px-8 relative">
+      <div className="max-w-3xl mx-auto">
+        {/* Header */}
+        <div className="flex justify-between items-center mb-8">
+          <h2 className="text-2xl font-bold text-gray-800">
+            Welcome, <span className="text-blue-600">{localStorage.getItem("username")}</span>
+          </h2>
+          <button
+            onClick={() => {
+              LogOutFuncDialog();
+            }}
+            className="bg-red-500 text-white py-2 px-4 rounded hover:bg-red-600 transition"
+          >
+            Log Out
+          </button>
+        </div>
 
-      <input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Canvas title" />
-      <button onClick={createCanvas}>Create Canvas</button>
-      <button
-          className="bg-blue-500 text-white py-2 px-4 rounded w-full hover:bg-blue-600"
-          onClick={handleLogOut}
-        >
-        Log Out
-        </button>
-
-      <h3>Global Canvases</h3>
-      <ul>
-        {canvases.map((c) => (
-          <li key={c._id}>
-            <button onClick={() => navigate(`/canvas/${c._id}`)}>
-              {c.title} by {c.createdBy?.username}
+        {/* Create Canvas Form */}
+        <div className="bg-white shadow-md rounded-lg p-6 mb-10">
+          <h3 className="text-xl font-semibold mb-4 text-gray-700">Create a New Canvas</h3>
+          <div className="flex flex-col sm:flex-row gap-4">
+            <input
+              value={title}
+              onChange={(e) => {
+                setTitle(e.target.value);
+                if (error) setError("");
+              }}
+              placeholder="Canvas title"
+              className={`flex-1 px-4 py-2 border ${error ? "border-red-500" : "border-gray-300"
+                } rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500`}
+            />
+            <button
+              onClick={createCanvas}
+              className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-md transition"
+            >
+              Create
             </button>
-          </li>
-        ))}
-      </ul>
+          </div>
+          {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
+        </div>
+
+        {/* Canvas List */}
+        <div className="bg-white shadow-md rounded-lg p-6">
+          <h3 className="text-xl font-semibold mb-4 text-gray-700">Global Canvases</h3>
+          {canvases.length === 0 ? (
+            <p className="text-gray-500">No canvases yet. Be the first to create one!</p>
+          ) : (
+            <ul className="space-y-3">
+              {canvases.map((c) => (
+                <li key={c._id}>
+                  <button
+                    onClick={() => navigate(`/canvas/${c._id}`)}
+                    className="w-full text-left bg-gray-100 hover:bg-gray-200 p-3 rounded-md transition shadow-sm"
+                  >
+                    <span className="font-medium text-gray-800">{c.title}</span>{" "}
+                    <span className="text-sm text-gray-500">
+                      by {c.createdBy?.username || "Unknown"}
+                    </span>
+                  </button>
+                  {/* <button
+                   value={c._id}
+                    onClick={(e) => deltefunc(e)}
+                    className="w-full text-left bg-gray-100 hover:bg-gray-200 p-3 rounded-md transition shadow-sm"
+                  >
+                    delete
+                  </button> */
+                    <button
+                      onClick={() => {
+                        deleteFuncDialog(c._id)
+                      }}
+                      className="bg-red-500 text-white py-2 px-4 rounded hover:bg-red-600 transition"
+                    >Delete</button>}
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+      </div>
+
+      {/* Logout Confirmation Modal */}
+      {/* {showModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-sm bg-white/30">
+          <div className="bg-white rounded-lg shadow-lg p-6 w-80">
+            <h2 className="text-lg font-semibold text-gray-800 mb-4">Confirm {modelText}</h2>
+            <p className="text-gray-600 mb-6">Are you sure you want to {modelText}?</p>
+            <div className="flex justify-end gap-3">
+              <button
+                onClick={() => setShowModal(false)}
+                className="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300 text-gray-800"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => {
+                  func
+                }}
+                className="px-4 py-2 rounded bg-red-600 hover:bg-red-700 text-white"
+              >
+                Yes, {modelText}
+              </button>
+            </div>
+          </div>
+        </div>
+      )} */}
+      <ConfirmModal
+        show={showModal}
+        text={modelText}
+        onConfirm={async () => {
+          await func?.();
+          setShowModal(false);
+        }}
+        onCancel={() => setShowModal(false)}
+      />
+
     </div>
   );
 };
