@@ -1,7 +1,10 @@
 import axios from "axios";
 
 const instance = axios.create({
-  baseURL: "http://localhost:3000", // your backend
+  baseURL: import.meta.env.BACKEND_URL || "http://localhost:3000",
+  headers: {
+    "Content-Type": "application/json",
+  },
 });
 
 instance.interceptors.request.use((config) => {

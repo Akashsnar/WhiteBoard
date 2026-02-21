@@ -7,10 +7,11 @@ const Dashboard = () => {
   const [canvases, setCanvases] = useState([]);
   const [title, setTitle] = useState("");
   const [error, setError] = useState("");
-  const [showModal, setShowModal] = useState(false); // Modal control
+  const [showModal, setShowModal] = useState(false);
   const [modelText, setmodelText] = useState("")
   const [func, setfunc] = useState()
-
+  
+  
 
   const navigate = useNavigate();
 
@@ -78,8 +79,6 @@ const Dashboard = () => {
             Log Out
           </button>
         </div>
-
-        {/* Create Canvas Form */}
         <div className="bg-white shadow-md rounded-lg p-6 mb-10">
           <h3 className="text-xl font-semibold mb-4 text-gray-700">Create a New Canvas</h3>
           <div className="flex flex-col sm:flex-row gap-4">
@@ -102,14 +101,12 @@ const Dashboard = () => {
           </div>
           {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
         </div>
-
-        {/* Canvas List */}
         <div className="bg-white shadow-md rounded-lg p-6">
           <h3 className="text-xl font-semibold mb-4 text-gray-700">Global Canvases</h3>
-          {canvases.length === 0 ? (
-            <p className="text-gray-500">No canvases yet. Be the first to create one!</p>
+          {(canvases.length == 0) ? (
+            <p className="text-gray-500">{canvases.length } No canvases yet. Be the first to create one!</p>
           ) : (
-            <ul className="space-y-3">
+             <ul className="space-y-3">
               {canvases.map((c) => (
                 <li key={c._id}>
                   <button
@@ -121,13 +118,7 @@ const Dashboard = () => {
                       by {c.createdBy?.username || "Unknown"}
                     </span>
                   </button>
-                  {/* <button
-                   value={c._id}
-                    onClick={(e) => deltefunc(e)}
-                    className="w-full text-left bg-gray-100 hover:bg-gray-200 p-3 rounded-md transition shadow-sm"
-                  >
-                    delete
-                  </button> */
+                  {
                     <button
                       onClick={() => {
                         deleteFuncDialog(c._id)
@@ -141,31 +132,6 @@ const Dashboard = () => {
         </div>
       </div>
 
-      {/* Logout Confirmation Modal */}
-      {/* {showModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-sm bg-white/30">
-          <div className="bg-white rounded-lg shadow-lg p-6 w-80">
-            <h2 className="text-lg font-semibold text-gray-800 mb-4">Confirm {modelText}</h2>
-            <p className="text-gray-600 mb-6">Are you sure you want to {modelText}?</p>
-            <div className="flex justify-end gap-3">
-              <button
-                onClick={() => setShowModal(false)}
-                className="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300 text-gray-800"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={() => {
-                  func
-                }}
-                className="px-4 py-2 rounded bg-red-600 hover:bg-red-700 text-white"
-              >
-                Yes, {modelText}
-              </button>
-            </div>
-          </div>
-        </div>
-      )} */}
       <ConfirmModal
         show={showModal}
         text={modelText}

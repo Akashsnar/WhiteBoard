@@ -5,12 +5,12 @@ const SignupSignin = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     const username = e.target.username.value;
-    //const socket = window.io("http://localhost:3000");
+    //const socket = window.io("import.meta.env.BACKEND_URL");
     // socket.emit("register-user", { username });
     console.log(`Registered user: ${username}`);
   }
 
-  // const socket = window.io("http://localhost:3000");
+  // const socket = window.io("import.meta.env.BACKEND_URL");
   // socket.on("connect", () => {
   //   console.log("Connected to the server");
   // });
