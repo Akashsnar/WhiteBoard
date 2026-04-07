@@ -2,7 +2,7 @@ import { useRef, useEffect, useState } from "react";
 import { io } from "socket.io-client";
 import { useParams } from 'react-router-dom';
 
-const socket = io(import.meta.env.BACKEND_URL);
+const socket = io(import.meta.env.VITE_BACKEND_URL);
 
 const CanvasBoard = () => {
   const { id: canvasId } = useParams();
