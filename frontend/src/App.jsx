@@ -26,6 +26,10 @@ import CanvasRoom from "./pages/CanvasRoom";
 import {ProtectedRoute} from "./middlware/protected"
 
 function App() {
+  const token = localStorage.getItem("token");
+if (!token) {
+  navigate("/login");
+}
   return (
     <BrowserRouter>
       <Routes>
