@@ -24,8 +24,10 @@ import Signup from "./pages/Signup";
 import Dashboard from "./pages/Dashboard";
 import CanvasRoom from "./pages/CanvasRoom";
 import {ProtectedRoute} from "./middlware/protected"
+import { useNavigate } from "react-router-dom";
 
 function App() {
+   const navigate = useNavigate();
   const token = localStorage.getItem("token");
 if (!token) {
   navigate("/login");
